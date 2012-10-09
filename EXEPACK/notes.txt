@@ -1,0 +1,9 @@
+Skipping passwords
+
+GAME.OVR:
+
+74 03 E9 28 FD C6 06
+EB
+
+75 06 C6 46 FF 01 EB 04
+90 90
