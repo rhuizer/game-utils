@@ -196,6 +196,8 @@ err2:
 		cga->surface->refcount--;
 err:
 	SDL_FreeSurface(s);
+
+	return -1;
 }
 
 int cga_set_surface(struct cga_context *cga, SDL_Surface *surface)

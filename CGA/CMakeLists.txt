@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 2.6)
+project(cga)
+set(CMAKE_C_FLAGS "-Wall")
+find_package(SDL)
+add_library(cga SHARED cga.c sdl_common.c)
+add_library(cga-static STATIC cga.c sdl_common.c)
+target_link_libraries(cga ${SDL_LIBRARY})
