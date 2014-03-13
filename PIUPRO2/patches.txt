@@ -1,0 +1,55 @@
+module.ko patches the following kernel addresses:
+
+0xC128C1C8
+----------
+
+Systemcall table entry for sys_ptrace.  Hooked with function 0x80002B9.
+
+0xC12A3710
+----------
+
+struct file_operations open function for /dev/mem (open_mem).
+Hooked with stub that returns -ENODEV.
+
+0xC12A3790
+----------
+
+struct file_operations open function for /dev/kmem (open_kmem).
+Hooked with stub that returns -ENODEV.
+
+0xC1292070
+----------
+
+struct file_operations open function for /proc/kcore (open_kcore).
+Hooked with stub that returns -ENODEV.
+
+0xC1290650
+----------
+
+Currently unknown.  Some file_operations structure open function.
+
+0xC128FF90
+----------
+
+struct file_operations open function for /proc/pid/maps (pid_maps_open).
+Hooked with stub that returns -ENODEV.
+
+0xC128FEE8
+----------
+struct file_operations read function for /proc/pid/tasks/maps (seq_read).
+Hooked with stub 0x80002D9.
+
+0xC13BFD40
+----------
+
+modules_disabled flag.  Set to 1.
+
+0xC13C42C8
+----------
+
+changes default_security_ops.name from "default" to "module".
+
+0xC1057B37
+----------
+
+do_coredump first byte is patched to 0xC3 (ret).
