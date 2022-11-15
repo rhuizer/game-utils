@@ -1,0 +1,290 @@
+Published Name		Quran
+Published Author	Allah
+Published Country	Jannah
+Published OpenSource	NO
+
+;--------------------------------------------------------------------------
+;- Quran
+;--------------------------------------------------------------------------
+;- Create a cross shape that spawns deactivating runners.
+;- Later in the game use flooding killers.
+;--------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------
+;- Defines
+;--------------------------------------------------------------------------
+;- Saw these in the Mojo Jojo bot, saves a lot of confusion
+;--------------------------------------------------------------------------
+Define	&IFEQ (?op1, ?op2)		{ NCOMP	?op1, ?op2 }
+Define	&IFNE (?op1, ?op2)		{ COMP	?op1, ?op2 }
+Define	&IFLT (?op1, ?op2)		{ GCOMP	?op1, ?op2 }
+Define	&IFGT (?op1, ?op2)		{ LCOMP	?op1, ?op2 }
+
+Define	&Bank.Of.Enlightenment		{  8 }
+Define	&Bank.Of.Iman			{ 33 }
+Define	&Bank.Of.Holy.Jihad.Warrior	{ 34 }
+Define	&Bank.Of.Caliph			{ 21 }
+
+;--------------------------------------------------------------------------
+;- Muhammad
+;--------------------------------------------------------------------------
+;- Creator of Imans, will make Jihad on us all!
+;--------------------------------------------------------------------------
+Bank	1
+
+@Muhammad
+	Set	#Active, $Id
+
+; Appoint three Imans, and actively brand them loyal muslims.
+
+	Create	2, 2, 0
+	Trans	&Bank.Of.Iman, 1
+	Set	%Active, $Id
+	Trans	&Bank.Of.Holy.Jihad.Warrior, 2
+	Turn	1
+
+	Create	2, 2, 0
+	Trans	&Bank.Of.Iman, 1
+	Set	%Active, $Id
+	Trans	&Bank.Of.Holy.Jihad.Warrior, 2
+	Turn	1
+
+	Create	2, 2, 0
+	Trans	&Bank.Of.Iman, 1
+	Set	%Active, $Id
+	Trans	&Bank.Of.Holy.Jihad.Warrior, 2
+	Turn	1
+
+	BJump	12, 1
+
+;--------------------------------------------------------------------------
+;- Banks Of Islam
+;--------------------------------------------------------------------------
+;- These banks embody mind and spirit of the true faith.
+;--------------------------------------------------------------------------
+Bank 2
+Bank 3
+Bank 4
+Bank 5
+Bank 6
+Bank 7
+
+;--------------------------------------------------------------------------
+;- Bank of Enlightenment
+;--------------------------------------------------------------------------
+;- Improves the level of awareness of he who runs this bank.
+;--------------------------------------------------------------------------
+Bank 8
+	BJump           3, 1
+
+;--------------------------------------------------------------------------
+;- Banks Of Islam
+;--------------------------------------------------------------------------
+;- These banks embody mind and spirit of the true faith.
+;--------------------------------------------------------------------------
+Bank 9
+Bank 10
+Bank 11
+
+;--------------------------------------------------------------------------
+;- Muhammad
+;--------------------------------------------------------------------------
+;- Creator of Caliphs, will make Jihad on us all!
+;--------------------------------------------------------------------------
+Bank 12
+
+@Muhammad.Preach
+	Scan	#13
+	&IFNE	(#13, 1)
+		Jump	@Muhammad.No.Infidel
+
+; We have found an infidel. Inflict pain upon him.
+	Set	%Active, 0
+	Set	#3, %Banks
+
+; Thus Muhammad converted pagans, heathens and heretics, and succes was
+; his, as pagan, heathen and heretic fanatically gave up their lives for
+; their newly found Faith!
+	@Muhammad.Convert
+		Trans	11, #3
+		Sub	#3, 1
+		&IFGT	(#3, 0)
+	Jump	@Muhammad.Convert
+
+	Set	%Active, 1
+	Jump	@Muhammad.Identify.Heathens
+
+; Empty spot, or a fellow believer. If empty, breed a future Caliph.
+@Muhammad.No.Infidel
+	&IFNE	(#13, 2)
+		Create	2, 5, 0
+
+@Muhammad.Identify.Heathens
+	&IFEQ	(%Active, $Id)
+		Jump	@Muhammad.Leave.Heathen.To.Die
+
+; Initiate the newly bred and appoint him Caliph! What honor!
+	Trans	&Bank.Of.Enlightenment, 1
+	Trans	&Bank.Of.Caliph, 3
+	Set	%Active, $Id
+	Trans	&Bank.Of.Enlightenment, 4
+
+@Muhammad.Leave.Heathen.To.Die
+	Turn	0
+	Jump	@Muhammad.Preach
+
+;--------------------------------------------------------------------------
+;- Muhammad is full with Banks of Islam!
+;--------------------------------------------------------------------------
+Bank 13
+Bank 14
+Bank 15
+Bank 16
+Bank 17
+Bank 18
+Bank 19
+Bank 20
+
+;--------------------------------------------------------------------------
+;- Caliph
+;--------------------------------------------------------------------------
+;- A Caliph. Does almost the same as Muhammad, but of course at a different
+;- level of awareness and enlightenment.
+;--------------------------------------------------------------------------
+;- Bank 1: Bank of Enlightenment
+;- Bank 2: Bank of Islam
+;- Bank 3: Bank of Caliph
+;- Bank 4: Bank of Enlightenment
+;--------------------------------------------------------------------------
+Bank 21
+
+@Caliph
+	Set	#Active, $Id
+
+@Caliph.Preach
+	Scan	#4
+	&IFNE	(#4, 1)
+		Jump	@Caliph.No.Infidel
+
+; Thus the Caliph, under the guidance of Muhammad, converted...
+	Set	%Active, 0
+	Set	#10, %Banks
+
+	@Caliph.Convert
+		Trans	2, #10
+		Sub	#10, 1
+		&IFGT	(#10, 0)
+	Jump @Caliph.Convert
+
+	Set	%Active, 1
+	Jump	@Caliph.Identify.Heathens
+
+@Caliph.No.Infidel
+	&IFNE	(#4, 2)
+		Create	2, 5, 0
+
+@Caliph.Identify.Heathens
+	&IFEQ	(%Active, $Id)
+		Jump	@Caliph.Look.Around.For.Heathens
+
+; And the Caliph appointed another Caliph, and the Faith was spread!
+	Trans	4, 1
+	Trans	3, 3
+	Set	%Active, $Id
+	Trans	4, 4
+
+@Caliph.Look.Around.For.Heathens
+	Turn	0
+	Jump	@Caliph.Preach
+
+;--------------------------------------------------------------------------
+;- Muhammad is full with Banks of Islam!
+;--------------------------------------------------------------------------
+Bank 22
+Bank 23
+Bank 24
+Bank 25
+Bank 26
+Bank 27
+Bank 28
+Bank 29
+Bank 30
+Bank 31
+Bank 32
+
+;--------------------------------------------------------------------------
+;- Iman
+;--------------------------------------------------------------------------
+;- Appoint another Iman and Seven Holy Jihad Warriors
+;--------------------------------------------------------------------------
+;- Bank 1: Bank of Iman
+;- Bank 2: Bank of Holy Jihad Warrior
+;--------------------------------------------------------------------------
+Bank 33
+
+@Iman
+	Create	2, 2, 0
+	Trans	1, 1
+	Set	%Active, $Id
+	Trans	2, 2
+	Turn	1
+
+; Thou shall create seven Holy Warriors, no more, no less.
+; Seven shall be the number thou shalt create, and the number of creation
+; shalt be seven. Eight shalt thou not create, nor either create thou six,
+; excepting that thou then proceed to seven. Nine is right out. Once the
+; number seven, being the seventh number, be reached, then lobbest thou thy
+; Holy Warrior of Jihad towards thou foe, who being naughty in my sight,
+; shall snuff it.
+
+@Iman.Preach
+	Create	0, 1, 1
+	Trans	2, 1
+	Set	%Active, $Id
+	Add	#8, 1
+	&IFNE	(#8, 7)
+Jump @Iman.Preach
+
+; After such a worthy time of service, we give our life for True Faith.
+	Die
+
+;--------------------------------------------------------------------------
+;- Holy Jihad Warrior
+;--------------------------------------------------------------------------
+;- Runs around and bombs^Wdeactivates all infidels
+;--------------------------------------------------------------------------
+;- Bank 1: Bank of Holy Jihad Warrior
+;--------------------------------------------------------------------------
+Bank 34
+
+@Holy.Jihad.Warrior
+	&IFEQ (%Banks, 0)
+		Jump	@Holy.Jihad.Warrior.No.Infidel
+
+@Holy.Jihad.Warrior.Infidel
+	&IFNE (%Active, $Id)		; Did we find an infidel?
+		Set	%Active, 0	; Wage war on him! Burn! Nyahaha!
+	Turn	1
+
+@Holy.Jihad.Warrior.No.Infidel
+	Move
+
+;--------------------------------------------------------------------------
+;- Muhammad is full with Banks of Islam!
+;--------------------------------------------------------------------------
+Bank 35
+Bank 36
+Bank 37
+Bank 38
+Bank 39
+Bank 40
+Bank 41
+Bank 42
+Bank 43
+Bank 44
+Bank 45
+Bank 46
+Bank 47
+Bank 48
+Bank 49
+Bank 50

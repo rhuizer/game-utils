@@ -7,7 +7,7 @@
 #
 # Quick and dirty hack.  No design, I know.
 #
-#  -- Ronald Huizer (C) 2012 / r.huizer@xs4all.nl
+#  -- Ronald Huizer (C) 2012 / rhuizer@hexpedition.com
 #
 import sys
 import struct

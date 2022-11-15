@@ -1,0 +1,166 @@
+Published Name		GnapGnapGnap
+Published Author	Ronald Huizer
+Published Country	The Netherlands
+Published OpenSource	NO
+
+;--------------------------------------------------------------------------
+;- GnapGnapGnap
+;--------------------------------------------------------------------------
+; This bot uses flooding to spread over the grid, and tries to infect
+; other bots to induce them to do the same thing.
+; By propagating $ID through %Active and having infected bots test #Active
+; against $ID, a global kind of Elimination Trigger is emulated, which
+; kills all infected enemies after 60.000 cycles.
+; This value can of course be derived from the configured game times, but
+; I chose not to, to prevent slowing the bot down by performing additional
+; arithmetic.
+; This is not a very fast trick, as it takes continuous comparing, but
+; it works globally unlike the normal elimination trigger, even in
+; situations where the elimination trigger has been disabled, and I have
+; not seen it used in other robocom bots.
+;
+; Both friends and enemies are continuously reprogrammed, resulting in
+; attack as well as defense. Nontheless the main bot has multiple banks,
+; which will result in some reprogramming time loss for the entire viral
+; cancer when reprogramming the main bot, as it has multiple banks.
+; However, as the main bot will be in the center of the cancer, there is
+; not much to do for the cells surrounding it anyhow, and bank transfer
+; loss times are acceptible. When the surrounding cells are reached by
+; the enemy, there are bound to be problems anyhow.
+; The reason the main bot has multiple banks is to compensate for grid
+; layouts where the enemy starts very close by, or even next to us.
+;
+; Bots are not stopped before reprogramming, in order to save time.
+; This yields some very interesting results against certain bots such
+; as CopyBot, as the program counter isn't reset, and the most interesting
+; part of the injected code overlaps with the area where most runtime is
+; spent in CopyBot entities :-)
+;--------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------
+;- Bootstrap to a higher bank
+;--------------------------------------------------------------------------
+
+Bank 1
+
+BJump	11, 1		; Transfer control to main bank
+
+;--------------------------------------------------------------------------
+;- Padding banks to make mother bot forward overwrites more complex
+;--------------------------------------------------------------------------
+
+Bank 2
+Bank 3
+Bank 4 
+Bank 5
+Bank 6
+Bank 7
+Bank 8
+Bank 9
+Bank 10
+
+;--------------------------------------------------------------------------
+;- Code bank for the primary Cancer Cell Mother
+;--------------------------------------------------------------------------
+Bank 11
+
+@START
+
+Set	#11, %Banks
+
+Comp	#11, 0
+Jump	@SwipeEnemyBanksLoop
+
+; If reference point empty, then create new cell
+; For the mother we duplicate code here, as bank transfer cost
+; is not relevant to bootstrapping.
+Create	2, 1, 0
+Trans	19, 1
+Set	%Active, $ID
+Turn	0
+Jump	@START
+
+@SwipeEnemyBanksLoop
+Trans	19, #11
+Sub	#11, 1
+LComp	#11, 0
+Jump	@SwipeEnemyBanksLoop
+
+Set	%Active, $ID
+Turn	0
+Jump	@START
+
+;--------------------------------------------------------------------------
+;- Padding banks to make mother bot overwrites more complex
+;--------------------------------------------------------------------------
+Bank 12
+Bank 13
+Bank 14
+Bank 15
+Bank 16
+Bank 17
+Bank 18
+
+;--------------------------------------------------------------------------
+;- Code bank for next generations and viral injection
+;--------------------------------------------------------------------------
+
+Bank 19
+
+@START2
+Set	#11, %Banks
+
+Comp	#11, 0
+Jump	@SwipeEnemyBanksLoop2
+GComp	$Time, 60
+Create	2, 1, 0
+Set	#11, 1
+
+@SwipeEnemyBanksLoop2
+Trans	1, #11
+Sub	#11, 1
+LComp	#11, 0
+Jump	@SwipeEnemyBanksLoop2
+
+Set	%Active, #Active
+Turn	1
+
+GComp	$Time, 60
+Jump	@START2
+Comp	#Active, $ID
+Die
+
+;--------------------------------------------------------------------------
+;- Padding banks to make reverse mother bot overwrites more complex
+;--------------------------------------------------------------------------
+Bank 20
+Bank 21
+Bank 22
+Bank 23
+Bank 24
+Bank 25
+Bank 26
+Bank 27
+Bank 28
+Bank 29
+Bank 30
+Bank 31
+Bank 32
+Bank 33
+Bank 34
+Bank 35
+Bank 36
+Bank 37
+Bank 38
+Bank 39
+Bank 40
+Bank 41
+Bank 42
+Bank 43
+Bank 44
+Bank 45
+Bank 46
+Bank 47
+Bank 48
+Bank 49
+Bank 50

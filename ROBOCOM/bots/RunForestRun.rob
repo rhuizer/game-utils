@@ -1,0 +1,178 @@
+Published Name		Run Forest Run
+Published Author	Ronald Huizer
+Published Country       The Netherlands
+Published OpenSource    NO
+
+;-------------------------------------------------------------------------
+;- Run Forest Run
+;-------------------------------------------------------------------------
+;- Proof of concept demonstration of fast single bank transfer by
+;- (ab)using multitasking.
+;-------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------
+; Primary Bank; contains bootstrap code
+;-------------------------------------------------------------------------
+Bank 1
+	BJump	11, 1		; Transfer control to main bank
+
+;-------------------------------------------------------------------------
+; Padding banks to make mother bot overwrites more complex
+;-------------------------------------------------------------------------
+Bank 2
+Bank 3
+Bank 4 
+Bank 5
+Bank 6
+Bank 7
+Bank 8
+Bank 9
+Bank 10
+
+;-------------------------------------------------------------------------
+;- Simple proof of concept Mother bot; merely spawns Runners
+;-------------------------------------------------------------------------
+;- The Mother.Start loop has been unrolled a bit to save a bit on the
+;- single cycle cost of the Jump to the beginning. Rebooting is not an
+;- option, since we run on a non-standard bank, and cannot afford to run
+;- Bank 1 code again because of possible infection.
+;-------------------------------------------------------------------------
+Bank 11
+
+@Mother.Start
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+	Create 2, 2, 1
+	Trans 20, 1
+	Set %Active, 1
+	Trans 21, 2
+	Turn 1
+Jump @Mother.Start
+
+;-------------------------------------------------------------------------
+; Padding banks to make mother bot overwrites more complex
+;-------------------------------------------------------------------------
+Bank 12
+Bank 13
+Bank 14
+Bank 15
+Bank 16
+Bank 17
+Bank 18
+Bank 19
+
+; ------------------------------------------------------------------------
+; - Kamikaze Virus
+; ------------------------------------------------------------------------
+; - Scan loop which makes a Kamikaze Virus move around.
+; ------------------------------------------------------------------------
+Bank 20
+
+; Jump table; this switches on scan cases, and is faster for the non
+; enemy cases.
+; Entry can be either using a BJump .., 3 or simply start here for KVs,
+; as this will execute the empty field code, i.e. Move.
+	Jump	@Empty
+	Jump	@Enemy
+	Jump	@Friend
+
+@KV.Move
+; Scan reference square and efficiently jump to case handlers.
+; Too bad scan doesn't return [1,2,3]; this slows down enemy response
+; a bit.
+	Scan	#10
+	Add	#10, 1		
+	AJump	#10
+
+@Enemy
+	Resume			; First use the @QuickTrans
+
+; We again set *all* the banks here, this could do some double work which
+; QuickTrans did, but testing this costs a lot. We don't care redoing what
+; QuickTrans did - it's purpose is FAST bank injection.
+
+	Set	#11, %Banks
+	@Enemy.SwipeBanks
+		Trans   2, #11
+		Sub     #11, 1
+		LComp   #11, 0
+		Jump    @Enemy.SwipeBanks
+
+@Friend
+	Turn	0
+@Empty
+	Jump	$Tasks
+	Jump	@KV.Prealloc
+
+@Empty.Move
+	Move
+	Jump	@KV.Move
+
+; A Kamikaze virus preallocates a second task which will suspend on the
+; last cycle of a bank transfer. This allows for slightly faster bank
+; overwrites against the opponent, where the first bank can be transferred
+; in a single cycle.
+
+@KV.Prealloc
+	Init	1, @QuickTrans
+	Sleep	14		; Trans costs 14 + 1 per instruction
+				; The code bank is 2 instructions big
+	Seize			; Grab control, till we want to unleash
+				; @QuickTrans >:)
+	Jump	@Empty.Move
+
+@QuickTrans
+	Trans	2, 1
+	Quit
+
+; ------------------------------------------------------------------------
+; - Single Bank Kamikaze Virus
+; ------------------------------------------------------------------------
+; - The SBKV moves around in a straight line, and attacks the first enemy
+; - it finds by turning into it into a non-moving spinning infector.
+; - only attacks first bank for speed against flooders.
+; ------------------------------------------------------------------------
+
+Bank 21
+
+Trans	1, 1
+Turn	1
+Add	#13, 100

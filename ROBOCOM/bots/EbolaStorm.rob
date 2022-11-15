@@ -1,0 +1,387 @@
+Name EbolaStorm
+Author Ronald Huizer
+
+;-------------------------------------------------------------------------
+;- Ebola Storm
+;-------------------------------------------------------------------------
+;- Creates a cross shape which unleashes a viral torrent
+;- Uses a GnapGnapGnap flooder in a later stage of the game
+;-------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------
+; Primary Bank; contains bootstrap code
+;-------------------------------------------------------------------------
+Bank 1
+
+	BJump	11, 1		; Transfer control to main bank
+
+;-------------------------------------------------------------------------
+; Padding banks to make mother bot overwrites more complex
+;-------------------------------------------------------------------------
+
+Bank 2
+Bank 3
+Bank 4 
+Bank 5
+Bank 6
+Bank 7
+Bank 8
+Bank 9
+Bank 10
+
+;-------------------------------------------------------------------------
+;- Mother of Ebola
+;-------------------------------------------------------------------------
+;- Get the entire pandemic going >:)
+;-------------------------------------------------------------------------
+
+Bank 11
+
+; Create Ebola Hearths, and then let EH's multiply themselves.
+; Set %Active before the last trans optimizes the time at which the
+; child can start execution, however, containing only a BJump the child
+; will be too fast and transfer control to early. This will make the child
+; reboot, which isn't a problem :)
+	Create	2, 4, 1
+	Trans	26, 1			; EBH bootstrap
+	Set	%Active, $Id
+	Trans	25, 2			; Ebola Heart main
+	Trans	20, 3			; KV Bank -> Bank 3
+	Trans	21, 4			; KV Injection Code -> Bank 4
+
+	Turn	0
+
+	Create	2, 4, 1
+	Trans	26, 1			; EBC bootstrap
+	Set	%Active, $Id
+	Trans	29, 2			; Ebola Heart main
+	Trans	27, 3			; KV Bank -> Bank 3
+	Trans	28, 4			; KV Injection Code -> Bank 4
+
+	Turn	0
+
+	Create	2, 4, 1
+	Trans	26, 1			; EBH bootstrap
+	Set	%Active, $Id
+	Trans	25, 2			; Ebola Heart main
+	Trans	20, 3			; KV Bank -> Bank 3
+	Trans	21, 4			; KV Injection Code -> Bank 4
+
+	Turn	0
+
+	Create	2, 4, 1
+	Trans	26, 1			; EBC bootstrap
+	Set	%Active, $Id
+	Trans	29, 2			; Ebola Heart main
+	Trans	27, 3			; KV Bank -> Bank 3
+	Trans	28, 4			; KV Injection Code -> Bank 4
+
+; Mother bot will continuously spawn cleaners from now on.
+; Unrolled loop a bit to save on jump cost.
+@Mother.Loop
+	Create	2, 4, 0
+	Trans	40, 1
+	Trans	40, 4
+	Set	%Active, $Id
+	Trans	40, 2
+	Trans	40, 3
+	Turn	0
+Jump	@Mother.Loop
+
+;-------------------------------------------------------------------------
+; Padding banks to make mother bot overwrites more complex
+;-------------------------------------------------------------------------
+Bank 12
+Bank 13
+Bank 14
+Bank 15
+Bank 16
+Bank 17
+Bank 18
+Bank 19
+
+; ------------------------------------------------------------------------
+; - Kamikaze Virus
+; ------------------------------------------------------------------------
+; - Scan loop which makes a Kamikaze Virus move around.
+; ------------------------------------------------------------------------
+
+Bank 20
+
+; Jump table; this switches on scan cases, and is faster for the non
+; enemy cases.
+; Entry can be either using a BJump .., 3 or simply start here for KVs,
+; as this will execute the empty field code, i.e. Move.
+	Jump	@Empty
+	Jump	@Enemy
+	Jump	@Friend
+
+@KV.Move
+; Scan reference square and efficiently jump to case handlers.
+; Too bad scan doesn't return [1,2,3]; this slows down enemy response
+; a bit.
+	Scan	#10
+	Add	#10, 1		
+	AJump	#10
+
+@Enemy
+	Resume			; First use the @QuickTrans
+
+; We again set *all* the banks here, this could do some double work which
+; QuickTrans did, but testing this costs a lot. We don't care redoing what
+; QuickTrans did - it's purpose is FAST bank injection.
+
+	Set	#11, %Banks
+	Comp	#11, 1
+	Set	%Active, 0
+	@Enemy.SwipeBanks
+		Trans   2, #11
+		Sub     #11, 1
+		LComp   #11, 0
+	Jump    @Enemy.SwipeBanks
+	Set	%Active, 0
+
+@Friend
+	Turn	0
+@Empty
+	Jump	$Tasks
+	Jump	@KV.Prealloc
+
+@Empty.Move
+	Move
+	Jump	@KV.Move
+
+; A Kamikaze virus preallocates a second task which will suspend on the
+; last cycle of a bank transfer. This allows for slightly faster bank
+; overwrites against the opponent, where the first bank can be transferred
+; in a single cycle.
+
+@KV.Prealloc
+	Init	1, @QuickTrans
+	Sleep	14		; Trans costs 14 + 1 per instruction
+				; The code bank is 2 instructions big
+	Seize			; Grab control, till we want to unleash
+				; @QuickTrans >:)
+	Jump	@Empty.Move
+
+@QuickTrans
+	Trans	2, 1
+	Quit
+
+; ------------------------------------------------------------------------
+; - Single Bank Kamikaze Virus
+; ------------------------------------------------------------------------
+; - The SBKV moves around in a straight line, and attacks the first enemy
+; - it finds by turning into it into a non-moving spinning infector.
+; - only attacks first bank for speed against flooders.
+; ------------------------------------------------------------------------
+
+Bank 21
+
+Trans	1, 1
+Turn	1
+Add	#13, 500
+
+; ------------------------------------------------------------------------
+; - Dual Bank Kamikaze Virus
+; ------------------------------------------------------------------------
+; - The DBKV moves around in a straight line, and attacks the first enemy
+; - it finds by turning into it into a non-moving spinning infector.
+; - only attacks first bank for speed against flooders.
+; ------------------------------------------------------------------------
+
+Bank 22
+
+Trans	1, 1
+Trans	1, 2
+Turn	1
+Add	#13, 500
+
+; ------------------------------------------------------------------------
+; - Triple Bank Kamikaze Virus
+; ------------------------------------------------------------------------
+; - The TBKV moves around in a straight line, and attacks the first enemy
+; - it finds by turning into it into a non-moving spinning infector.
+; - only attacks first bank for speed against flooders.
+; ------------------------------------------------------------------------
+
+Bank 23
+
+Trans	1, 1
+Trans	1, 2
+Trans	1, 3
+Turn	1
+Add	#13, 500
+
+; ------------------------------------------------------------------------
+; - Multi Bank Kamikaze Virus
+; ------------------------------------------------------------------------
+; - The MBKV moves around in a straight line, and attacks the first enemy
+; - it finds by turning into it into a non-moving spinning infector.
+; - attacks all banks for thourough infection.
+; ------------------------------------------------------------------------
+
+Bank 24
+
+Turn 1
+
+Set	#11, %Banks
+
+@SwipeBanks
+	Trans   1, #11
+	Sub     #11, 1
+	LComp   #11, 0
+	Jump    @SwipeBanks
+Add	#13, 500
+
+; ------------------------------------------------------------------------
+; - Ebola Hearth
+; ------------------------------------------------------------------------
+; - A viral cesspool that spawns various evil things.
+; ------------------------------------------------------------------------
+; - Bank 1: Contains Bank 26; A BJump bootstrapper
+; - Bank 2: Contains Bank 25: Ebola Hearth main loop
+; - Bank 3: Contains Bank 20: Kamikaze Virus Bank 1
+; - Bank 4: Contains Bank 24: KV MB infection code
+; ------------------------------------------------------------------------
+
+Bank 25
+
+; Create another Ebola Hearth.
+; Note that we set active before the last trans, to save some cycles in
+; the child.
+
+	Create	2, 4, 0
+	Trans	1, 1
+	Set	%Active, 1
+	Trans	2, 2
+	Trans	3, 3
+	Trans	4, 4
+
+	Turn 1
+
+; Ebola Hearth will start spawning MBKV's around
+
+@Loop2
+	Create	1,2,1
+	Trans	3, 1
+	Set	%Active, 1
+	Trans	4, 2
+Jump	@Loop2
+
+Bank 26
+
+BJump	2, 1
+
+;-------------------------------------------------------------------------
+;- Ebola Cleaner
+;-------------------------------------------------------------------------
+;- Cleans up infectees who have not deceased so far
+;-------------------------------------------------------------------------
+
+Bank 27
+
+@Cleaner.Start
+	Set	%Active, $Id		; Save friends, kill enemies
+	Random	#15, 0, 1
+	Turn	#15
+	Move
+	Move
+
+	Scan	#13
+	Comp	#13, 1
+Jump	@Cleaner.Start
+
+; In case of Enemy
+	Set	%Active, 0
+	Set	#11, %Banks
+
+	@Enemy.SwipeBanks3
+		Trans   3, #11		; Bank3 == Die
+		Sub     #11, 1
+		LComp   #11, 0
+	Jump    @Enemy.SwipeBanks3
+
+Jump	@Cleaner.Start
+
+Bank 28
+
+Die
+
+;-------------------------------------------------------------------------
+;- Ebola Cleaner Hearth
+;-------------------------------------------------------------------------
+;- Spawns cleaners.
+;-------------------------------------------------------------------------
+
+Bank 29
+	; Create another Cleaner Hearth
+	Create	2, 4, 0
+	Trans	1, 1
+	Set	%Active, $Id
+	Trans	2, 2
+	Trans	3, 3
+	Trans	4, 4
+
+	Turn 1
+
+@Loopje
+	Create	1,3,1
+	Trans	1, 1
+	Trans	3, 2 
+	Set	%Active, $Id
+	Trans	4, 3
+Jump	@Loopje
+
+Bank 30
+Bank 31
+Bank 32
+Bank 33
+Bank 34
+Bank 35
+Bank 36
+Bank 37
+Bank 38
+Bank 39
+
+;--------------------------------------------------------------------------
+;- GnapGnapGnap
+;--------------------------------------------------------------------------
+;- The GGG method for flooding is used later in the match
+;--------------------------------------------------------------------------
+Bank 40
+	BJump	$Banks, 2
+@GnapGnapGnap
+	Set     #11, %Banks
+	Comp    #11, 0
+	
+	Jump    @Swiffer
+	GComp   $Time, 60
+	Create  2, 4, 0
+	Set     #11, 4
+
+	@Swiffer
+		Trans   4, #11
+		Sub     #11, 1
+		LComp   #11, 0
+	Jump    @Swiffer
+
+	Set     %Active, #Active
+	Turn    1
+
+	GComp   $Time, 60
+Jump    @GnapGnapGnap
+
+	Comp    #Active, $ID
+	Die
+	
+Bank 41
+Bank 42
+Bank 43
+Bank 44
+Bank 45
+Bank 46
+Bank 47
+Bank 48
+Bank 49
+Bank 50
